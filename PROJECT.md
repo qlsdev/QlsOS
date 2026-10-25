@@ -22,23 +22,10 @@ The legacy monolithic design (POSIX-style processes including traditional `exec`
 The core development path towards the commercial v1.0.0 release is structured into 6 sequential engineering blocks (38 distinct tasks).
 
 ### Block A: Microkernel Preparation
-*   Task 1: Roll back legacy UNIX signals (`SYS_KILL`, `SYS_SIGNAL`, `SYS_SIGRETURN` are fully deleted).
-*   Task 2: Task slot generations implementation (Tasks are tracked via `task_ref_t = (slot, generation)` to invalidate stale references).
-*   Task 3: Per-task hardware limits (Strict resource quotas on physical memory frames and handle tables; overflow faults terminate the task only).
-*   Task 4: Isolated Page Fault Handling (Ring3 memory violations kill the offending task without inducing kernel panics; termination codes are safely captured in the task status structure).
-*   Task 5: Preemptive Blocking Sleep (Yields CPU clock cycles instantly; sleeping tasks consume zero scheduling overhead).
-*   Task 6: Unified Microkernel Blocking Primitives (`task_block(reason, arg)` abstraction implemented for sleep and synchronization frameworks).
-*   Task 7: System Performance Benchmarking (Boot timeline tracking and spawn latency metrics written directly to `baseline.txt`).
-*   Task 8, 8a-8c: System Audit & Contract Enforcement (Formalization of `ARCHITECTURE.md v0`, end-to-end 64-bit data cleanliness verification, compilation budget verification via `make ksize` and `make check64`).
+*   Tasks 1-8c: Roll back UNIX signals, implement task slot generations and resource limits, handle clean page faults, configure blocking sleep primitives, run baseline performance tracking, and perform full 64-bit static audit loops with `make check64` and `make ksize` enforcement.
 
-### Block B: Handles and Channels (Current Active Phase)
-*   Task 9: Per-Task Handle Tables (Implementation of `handle_install`, `handle_lookup`, access permissions mapping). -> *Status: Completed*
-*   Task 10: Capability Object Management (`handle_close` tracking and `handle_dup` permission restriction loops). -> *Status: Completed*
-*   Task 11: Microkernel Bounded Channels (Paired endpoints managing fixed-size 64-byte message structures with a 16-slot internal queue, handling abrupt peer destruction cleanly). -> *Status: Completed*
-*   Task 12: Advanced Channel Synchronization (Blocking send and receive kernel routines). -> **Status: NEXT ACTIVE TASK**
-*   Task 13: Capability Transfer in IPC Messages (Passing handles over channels with identical or decreased access rights). -> *Status: Pending*
-*   Task 14: Channel Stress-Testing Infrastructure (Ping-pong IPC validation, bounded queue overflow stress tests, peer death tracking). -> *Status: Pending*
-*   Task 15: Automated Object Lifetime Cleanup (Verification of automatic physical frame reclamation upon final handle closure). -> *Status: Pending*
+### Block B: Handles and Channels
+*   Tasks 9-15: Implementation of core handle tables with lookup controls, permission narrowing inside `handle_dup`, bounded 64-byte multi-slot synchronous/asynchronous IPC channels, synchronized blocking transfer routines, safe handle passing routines inside messages, and automatic object reference cleanup layers.
 
 ### Block C: Task Spawning & Capability Control
 *   Tasks 16-21: Implementation of `SYS_SPAWN` from user space, task lifecycle management via result channels instead of legacy `wait`, dedicated Task Control Handles, implementation of capability revocation, deletion of legacy `fork`/`waitpid` code and test manifests.
@@ -47,7 +34,7 @@ The core development path towards the commercial v1.0.0 release is structured in
 *   Tasks 22-28: Initialization of the Ring3 System Dispatcher, extraction of VGA Console and PS/2 Keyboard drivers into independent userspace tasks, executing the interactive shell in Ring3, resource capability inspections via `caps`, and regression testing under extreme conditions.
 
 ### Block E: Storage Subsystems & User Utilities
-*   Tasks 29-34: Translating the ATA/IDE disk driver into a userspace service, expanding QlsFS to manage real subdirectories and block reclamation upon removal operations, implementing file access layers over IPC channels, building a lightweight standalone `mini-libc` runtime, and migrating core user utilities (`ls`, `cat`, `echo`, `ps`, `mkdir`, `rm`).
+*   Tasks 29-34c: Translating the ATA/IDE disk driver into a userspace service, expanding QlsFS to manage real subdirectories and block reclamation upon removal operations, implementing file access layers over IPC channels, building a lightweight standalone `mini-libc` runtime, and migrating core user utilities (`ls`, `cat`, `echo`, `ps`, `mkdir`, `rm`).
 
 ### Block F: v1.0.0 Production Release
 *   Tasks 35-38: Final metrics collection, comprehensive architectural documentation updates, building production bootable ISOs and automated installers, and tagging the stable v1.0.0 microkernel release.
