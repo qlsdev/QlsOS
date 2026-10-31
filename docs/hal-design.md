@@ -19,7 +19,7 @@ functions in its own way.
 **Common (`kernel/src/`, built once, linked with any backend):**
 - `kernel.c` — the entry point, calls only `hal_*` and `arch_platform_init()`/`arch_extra_demo()`
 - `shell.c` — the line editor, history, commands — knows only about `hal_console_*`/`hal_input_*`
-- `task.c` — the cooperative scheduler — knows only about `hal_context_switch`/`hal_new_task_stack`/`hal_cpu_halt`
+- `task.c` — the scheduler (preemptive round-robin on x86) — knows only about `hal_context_switch`/`hal_new_task_stack`/`hal_cpu_halt`
 - `kheap.c` — a static arena in `.bss`, does not touch hardware at all, so it did not change by a single line
 - `kprintf.c` — used to live inside `vga.c`, now common, writes through `hal_console_putc`
 - `string.c` — does not touch hardware
